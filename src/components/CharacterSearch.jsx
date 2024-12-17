@@ -1,85 +1,90 @@
-//Componentes para buscar personajes de la serie Rick And Morty por nombre con la API de Rick And Morty y mostrarlos en una lista
-import React, {useState, useEffect, useRef} from "react";
-import './CharacterSearch.css'
+import React, { useState, useEffect, useRef } from "react";
+import './CharacterSearch.css';
 
 function CharacterSearch() {
+  const [characters, setCharacters] = useState([]); // Guardamos los personajes en una lista
+  const [error, setError] = useState(''); // Mensajes de error si ocurren
+  const [isAlive, setIsAlive] = useState(false); // Estado para el checkbox (si el checkbox está marcado)
+  const searchInput = useRef(); 
 
-    const [characters, setCharacters] = useState([]) // guardamos como lista
-    const [error, setError] = useState('nuññ')
-    // te guarda la referencia que esta buscando
-    const searchInput = useRef()
+  // Función para consumir la API de Rick and Morty y traer los personajes por nombre
+  const fetchCharacters = async (name, status) => {
+    try {
+      let url = `https://rickandmortyapi.com/api/character/?name=${name}`;
+      if (status) {
+        url += `&status=alive`; // Si el checkbox está marcado, solo traeremos personajes vivos
+      }
 
-    //Funcion para consumir la Api de RIck And Morty y traer los personajes por nombre
-    const fetchCharacters = async (name) =>{
-        try{
-            const response = await fetch(`https://rickandmortyapi.com/api/character/?name=${name}`);
-            const data = await response.json();
-            setCharacters(data.results)
-        }catch (eror){
-            setError(erorr)
-        }
+      const response = await fetch(url);
+      const data = await response.json();
+      setCharacters(data.results);
+    } catch (error) {
+      setError('Error al obtener personajes');
     }
+  };
 
-    
-    // HANDLE para realizar la busqueda del personaje
-    const handleSearch = () => {
-        const name = searchInput.current.value;
-        console.log(name);
-        fetchCharacters(name)
-    };
-    // HANDLE para realizar la busqueda al presionar la tecla Enter
-    const handleKeyDown = (event) => {
-        if (event.key === 'Enter'){
-            handleSearch()        
-        }
-    };
+  // HANDLE para realizar la búsqueda del personaje
+  const handleSearch = () => {
+    const name = searchInput.current.value;
+    fetchCharacters(name, isAlive); // Pasamos el estado de 'isAlive' para filtrar la búsqueda
+  };
 
+  // HANDLE para realizar la búsqueda al presionar la tecla Enter
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  // HANDLE para cambiar el estado del checkbox
+  const handleCheckboxChange = () => {
+    setIsAlive(!isAlive); // Cambia el estado cuando el checkbox es marcado/desmarcado
+  };
 
   return (
-    //input
-    //boton de busqueda
-    //contenero con cards
-    //cards con informacion Personajes
     <div>
-    <input type="text" placeholder="Buscar Personaje" 
-        ref={searchInput}
-        onKeyDown={handleKeyDown}
-    />
-    
-    <button
-    onClick={handleSearch}
-    
-    >
-        Buscar 
-    </button>
-    <input type="checkbox"  placeholder="Vivo?"
-        onChange={}
-    />
-    <div className="box-personaje">
-    {/* Vamos a iterar sobre los personajes mapeados y traemos los atributo de cada uno (name,status,species,gender,image) */}
-{characters.map((characters) => (
-    <div className="card-personajes-container" 
-    key={characters.id}>
-        <div> 
-            <img src={characters.image} alt="characters.name" />
-        </div>
-        <div>
-        <h3>Nombre: {characters.name}</h3>
-        <p>Estado: {characters.status}</p>
-        <p>Especie: {characters.species}</p>
-        <p>Genero: {characters.gender}</p>
-        </div>
+      <input 
+        type="text" 
+        placeholder="Buscar Personaje" 
+        ref={searchInput} 
+        onKeyDown={handleKeyDown} 
+      />
+      <label>
+        <input 
+          type="checkbox" 
+          checked={isAlive} 
+          onChange={handleCheckboxChange} 
+        />
+        Sólo vivos?
+      </label>
+      
+      <button onClick={handleSearch}>
+        Buscar
+      </button>
+
+
+      <div className="box-personaje">
+        {/* Vamos a iterar sobre los personajes mapeados y traer los atributos de cada uno */}
+        {characters.length > 0 ? (
+          characters.map((character) => (
+            <div className="card-personajes-container" key={character.id}>
+              <div>
+                <img src={character.image} alt={character.name} />
+              </div>
+              <div>
+                <h3>Nombre: {character.name}</h3>
+                <p>Estado: {character.status}</p>
+                <p>Especie: {character.species}</p>
+                <p>Género: {character.gender}</p>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p>No se encontraron personajes.</p>
+        )}
+      </div>
     </div>
-
-))
-}
-    
-    
-</div>
-    
-    </div>
-
-  )
+  );
 }
 
-export default CharacterSearch
+export default CharacterSearch;
