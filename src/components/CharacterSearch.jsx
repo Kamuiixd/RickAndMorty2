@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import './CharacterSearch.css';
-
 function CharacterSearch() {
   const [characters, setCharacters] = useState([]); // Guardamos los personajes en una lista
   const [error, setError] = useState(''); // Mensajes de error si ocurren
@@ -12,7 +11,7 @@ function CharacterSearch() {
     try {
       let url = `https://rickandmortyapi.com/api/character/?name=${name}`;
       if (status) {
-        url += `&status=alive`; // Si el checkbox está marcado, solo traeremos personajes vivos
+        url += `&status=alive`; // Si el checkbox está marcado.
       }
 
       const response = await fetch(url);
