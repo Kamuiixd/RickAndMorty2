@@ -1,10 +1,10 @@
 import React from 'react'
-import EjComponent from '../components/EjComponent'
+import EjComponent2 from '../components/EjComponent2'
 
 function PaginaEj() {
   return (
 
-      <EjComponent />
+      <EjComponent2 />
    
   )
 }

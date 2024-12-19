@@ -1,11 +1,11 @@
 import React from 'react'
-import CharacterSearch from '../components/CharacterSearch'
+import SearchCharacterPage from './SearchCharacterPage'
 
 function Home() {
   return (
     <div className='home'>
-        <div>Home</div>
-    <CharacterSearch></CharacterSearch>
+      <div>Home</div>
+      <div><SearchCharacterPage /> </div>
     </div>
   )
 }

@@ -1,15 +1,25 @@
 import React, { useState, useEffect, useRef } from "react";
 import './CharacterSearch.css';
+
+
+
 function CharacterSearch() {
   const [characters, setCharacters] = useState([]); // Guardamos los personajes en una lista
   const [error, setError] = useState(''); // Mensajes de error si ocurren
   const [isAlive, setIsAlive] = useState(false); // Estado para el checkbox (si el checkbox está marcado)
-  const searchInput = useRef(); 
+  const [loading, setLoading] = useState(true); // Estado para mostrar el spinner
+  const [page, setPage] = useState(1); // Guardamos las páginas de la API
+  const [totalPages, setTotalPages] = useState(1); // Guardamos el total de páginas de la API
+  const [searchName, setSearchName] = useState(null);
+  const searchInput = useRef();
 
   // Función para consumir la API de Rick and Morty y traer los personajes por nombre
   const fetchCharacters = async (name, status) => {
+
+    setLoading(true); // Mostramos el spinner antes de cargar los personajes
+
     try {
-      let url = `https://rickandmortyapi.com/api/character/?name=${name}`;
+      let url = `https://rickandmortyapi.com/api/character/?name=${name}&page=${page}`;
       if (status) {
         url += `&status=alive`; // Si el checkbox está marcado.
       }
@@ -17,15 +27,21 @@ function CharacterSearch() {
       const response = await fetch(url);
       const data = await response.json();
       setCharacters(data.results);
+      setTotalPages(data.info.pages);
+      setLoading(null);
     } catch (error) {
       setError('Error al obtener personajes');
     }
   };
 
+  useEffect(() => {
+    fetchCharacters(searchName, isAlive); // Usa el término de búsqueda dinámico
+  }, [page, searchName, isAlive]);
+
   // HANDLE para realizar la búsqueda del personaje
   const handleSearch = () => {
-    const name = searchInput.current.value;
-    fetchCharacters(name, isAlive); // Pasamos el estado de 'isAlive' para filtrar la búsqueda
+    setSearchName(searchInput.current.value); // Actualiza el estado
+    setPage(1); // Resetea la página al buscar
   };
 
   // HANDLE para realizar la búsqueda al presionar la tecla Enter
@@ -40,26 +56,41 @@ function CharacterSearch() {
     setIsAlive(!isAlive); // Cambia el estado cuando el checkbox es marcado/desmarcado
   };
 
+  //HANDLE para paginacion de personajes
+  const handleNextPress = (event) => {
+    if (page < totalPages) setPage(page + 1);
+    console.log('Next', page);
+  };
+
+  const handlePrevPress = (event) => {
+    if (page > 1) setPage(page - 1);
+    console.log('Prev', page);
+  };
+
   return (
+
     <div>
-      <input 
-        type="text" 
-        placeholder="Buscar Personaje" 
-        ref={searchInput} 
-        onKeyDown={handleKeyDown} 
+      <input
+        type="text"
+        placeholder="Buscar Personaje"
+        ref={searchInput}
+        onKeyDown={handleKeyDown}
       />
       <label>
-        <input 
-          type="checkbox" 
-          checked={isAlive} 
-          onChange={handleCheckboxChange} 
+        <input
+          type="checkbox"
+          checked={isAlive}
+          onChange={handleCheckboxChange}
         />
         Sólo vivos?
       </label>
-      
+
       <button onClick={handleSearch}>
         Buscar
       </button>
+      <span>{page} de {totalPages}</span>
+      <button onClick={handlePrevPress} disabled={page === 1}>Anterior</button>
+      <button onClick={handleNextPress} disabled={page === totalPages}>Siguiente</button>
 
 
       <div className="box-personaje">
