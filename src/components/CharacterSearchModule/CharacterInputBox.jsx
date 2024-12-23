@@ -1,12 +1,16 @@
-import React from 'react'
+import React, {useContext, useRef} from 'react'
+import { CharacterContext } from './CharacterContext';
 
-function CharacterInputBox({ onSearch }) {
+function CharacterInputBox() {
+    const { setSearchName, setPage } = useContext(CharacterContext);
+    const searchInput = useRef();
 
-
-    const searchInput = React.useRef();
+    
     //HANDLE DE BUSQUEDA DE PERSONAJES  
     const handleSearch = () => {
-        onSearch(searchInput.current.value);
+        const name = searchInput.current.value
+        setSearchName(name)
+        setPage(1); 
     };
 
     const handleKeyDown = (event) => {

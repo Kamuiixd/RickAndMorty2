@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   Card,
   CardContent,
@@ -8,10 +8,13 @@ import {
   Button,
 } from '@mui/material';
 import WatchMoreEpisodeModal from '../modal/WatchMoreEpisodeModal';
+import { CharacterContext } from './CharacterContext';
 
-function CharacterCardList({ characters = [] }) {
+function CharacterCardList() {
   const [selectedCharacter, setSelectedCharacter] = useState(null); // Estado para el personaje seleccionado
   const [modalOpen, setModalOpen] = useState(false); // Estado para controlar el modal
+  const { characters } = useContext(CharacterContext);
+  console.log('CHARACTERS', characters);
 
   const handleOpenModal = (character) => {
     setSelectedCharacter(character); // Asigna el personaje seleccionado
